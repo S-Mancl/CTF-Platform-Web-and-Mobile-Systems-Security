@@ -22,6 +22,8 @@ python3 ./main.py
 
 After that, the platform can be accessed at http://localhost:8000/
 
+If you are on Windows, run ``python3 main-windows.py`` instead. You may need the WSL installed.
+
 ### How to Use It
 
 When the platform is running (see previous section), open http://localhost:8000/
