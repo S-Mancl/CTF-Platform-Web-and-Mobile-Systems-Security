@@ -1,4 +1,4 @@
-# Web-and-Mobile-Security-CTF-Platform
+# CTF Platform for Web and Mobile Systems Security
 CTF platform for the course of Web and Mobile Systems Security at the University of Milan
 ---------
 
