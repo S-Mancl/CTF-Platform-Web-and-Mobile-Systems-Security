@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Challenge Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <style>
+        #log-window { background: #1e1e1e; color: #adadad; padding: 15px; height: 350px; 
+                      overflow-y: auto; font-family: 'Courier New', monospace; display: none; 
+                      margin-top: 20px; border-radius: 8px; border: 1px solid #555; }
+        .btn-danger { background-color: #a30000; color: white; }
+        .project-card { border: 1px solid #444; padding: 20px; margin-bottom: 15px; border-radius: 8px; }
+        .status-running { color: #2ecc71; font-weight: bold; }
+        .status-stopped { color: #95a5a6; }
+        #log-content {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            color: #2ecc71; 
+            background: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+    <h1>Challenges</h1>
+    <div id="project-list">Loading stacks...</div>
+    
+    <div id="log-window">
+        <div style="display:flex; justify-content: space-between; border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 10px;">
+            <strong>Live Streaming Logs</strong>
+            <button onclick="document.getElementById('log-window').style.display='none'" style="padding:0 10px">×</button>
+        </div>
+        <pre id="log-content" style="margin:0; white-space: pre-wrap;"></pre>
+    </div>
+
+    <script>
+        let logSource = null;
+
+        async function fetchProjects() {
+            const res = await fetch('/list');
+            const data = await res.json();
+            document.getElementById('project-list').innerHTML = data.map(p => `
+                <div class="project-card">
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">
+                        <strong>${p.name}</strong> 
+                        <span class="${p.status === 'running' ? 'status-running' : 'status-stopped'}">
+                            (${p.status})
+                        </span>
+                    </div>
+                    <button onclick="doAction('${p.name}', 'start')">▶️ Start</button>
+                    <button onclick="doAction('${p.name}', 'stop')">⏸️ Stop</button>
+                    <button onclick="doAction('${p.name}', 'build')">🔨 Build</button>
+                    <button onclick="viewLogs('${p.name}')">📄 Logs</button>
+                    <button onclick="window.open('${p.link}','_blank').focus()">🌐 Open</button>
+                    <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+                    <button class="btn-danger" onclick="confirmAction('${p.name}', 'delete_container', 'Delete Containers?')">🗑️ Delete Container</button>
+                    <button class="btn-danger" onclick="confirmAction('${p.name}', 'delete_image', 'Delete EVERYTHING (including Image)?')">🔥 Full Reset</button>
+                </div>
+            `).join('');
+        }
+
+        function confirmAction(project, action, msg) {
+            if (confirm(msg)) {
+                doAction(project, action);
+            }
+        }
+
+        async function doAction(project, cmd) {
+            await fetch(`/action/${project}/${cmd}`, {method: 'POST'});
+            setTimeout(fetchProjects, 1000);
+        }
+
+        function viewLogs(project) {
+            const win = document.getElementById('log-window');
+            const content = document.getElementById('log-content');
+            win.style.display = 'block';
+            content.textContent = `Connecting to ${project}... \n`;
+            
+            if (logSource) logSource.close();
+            
+            logSource = new EventSource(`/logs/${project}`);
+            logSource.onmessage = (e) => {
+                content.textContent += e.data + "\n"; 
+                win.scrollTop = win.scrollHeight;
+            };
+            
+            logSource.onerror = () => {
+                content.textContent += "[Stream Closed]\n";
+                logSource.close();
+            };
+        }
+
+        fetchProjects();
+        setInterval(fetchProjects, 5000);
+    </script>
+</body>
+</html>
