@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const app = express();
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const renderLayout = (title, content, extraHead = '') => `
@@ -167,6 +168,107 @@ app.get('/encodedcookies', (req, res) => {
     }
 });
 
+const PRODUCTS = {
+    1: { name: "Laptop", price: 800 },
+    2: { name: "Phone", price: 400 },
+    3: { name: "Platinum Flag Plus Pro", price: 999999 }
+};
+const WALLET_LIMIT = 1000;
+
+app.get('/luxuryshop', (req, res) => {
+    let cart = { items: [], total: 0 };
+    
+    if (req.cookies.shop_cart) {
+        try {
+            cart = typeof req.cookies.shop_cart === 'string' 
+                ? JSON.parse(req.cookies.shop_cart) 
+                : req.cookies.shop_cart;
+        } catch (e) { 
+            res.clearCookie('shop_cart'); 
+        }
+    }
+
+    const cartHtml = cart.items.map(id => `
+        <li>${PRODUCTS[id].name} <span>€${PRODUCTS[id].price}</span></li>
+    `).join("");
+
+    const error = req.query.error ? `<div class="warning">⚠️ ${req.query.error}</div>` : "";
+
+    res.send(renderLayout('Luxury Shop', `
+        <div class="icon">💎</div>
+        <h1>Luxury Shop</h1>
+        <p>Wallet Balance: <strong>€${WALLET_LIMIT}</strong></p>
+        
+        ${error}
+
+        <div style="text-align:left;">
+            ${Object.entries(PRODUCTS).map(([id, p]) => `
+                <div class="shop-item">
+                    <span>${p.name} (€${p.price})</span>
+                    <form method="POST" action="/luxuryshop/add" style="margin:0;">
+                        <input type="hidden" name="id" value="${id}">
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                </div>
+            `).join("")}
+        </div>
+
+        <h3 style="margin-top:20px;">Cart Summary</h3>
+        <ul>${cartHtml || "<li>Your cart is empty</li>"}</ul>
+        <div class="role">Total in Cookie: €${cart.total}</div>
+
+        <form method="POST" action="/luxuryshop/checkout">
+            <button style="width:100%; background:#28a745; margin-top:10px;">Complete Purchase</button>
+        </form>
+    `));
+});
+
+app.post('/luxuryshop/add', (req, res) => {
+    let cart = { items: [], total: 0 };
+    if (req.cookies.shop_cart) {
+        cart = typeof req.cookies.shop_cart === 'string' 
+            ? JSON.parse(req.cookies.shop_cart) 
+            : req.cookies.shop_cart;
+    }
+
+    const id = req.body.id;
+    const item = PRODUCTS[id];
+
+    if (item) {
+        if (cart.total + item.price > WALLET_LIMIT) {
+            return res.redirect('/luxuryshop?error=You+cannot+afford+this+item!');
+        }
+
+        cart.items.push(id);
+        cart.total += item.price;
+        
+        res.cookie('shop_cart', JSON.stringify(cart), { path: '/luxuryshop' });
+    }
+    res.redirect('/luxuryshop');
+});
+
+app.post('/luxuryshop/checkout', (req, res) => {
+    if (!req.cookies.shop_cart) return res.redirect('/luxuryshop');
+    
+    const cart = typeof req.cookies.shop_cart === 'string' 
+        ? JSON.parse(req.cookies.shop_cart) 
+        : req.cookies.shop_cart;
+
+    if (cart.items.includes("3") && cart.total <= WALLET_LIMIT) {
+        res.send(renderLayout('Success', `
+            <div class="icon">🏁</div>
+            <h1>Transaction Approved!</h1>
+            <p>You manipulated the price successfully.</p>
+            <div class="flag">flag{enjoy_your_platinum_flag_plus_pro}</div>
+            <br><a href="/" class="btn-link">Return Home</a>
+        `));
+    }
+    else if (cart.total > WALLET_LIMIT) {
+        res.redirect('/luxuryshop?error=Transaction+Declined:+Total+Exceeds+Wallet+Limit');
+    }
+    else { res.redirect('/luxuryshop?error=You+Nave+Not+Bought+The+Flag'); }
+});
+
 app.get('/bruteforceme', (req, res) => {
     const id = parseInt(req.cookies.id);
     if (hash32(id) === 3195296983) {
@@ -201,7 +303,8 @@ app.get('/', (req, res) => {
             <li><a href='/bargainhunter'>3. The Bargain Hunter</a></li>
             <li><a href='/timetraveler'>4. The Time Traveler</a></li>
             <li><a href='/encodedcookies'>5. Encoded Cookies</a></li>
-            <li><a href='/bruteforceme'>6. Bruteforce is an Option</a></li>
+            <li><a href='/luxuryshop'>6. The Luxury Shop</a></li>
+            <li><a href='/bruteforceme'>7. Bruteforce is an Option</a></li>
         </ul>
     `));
 });
