@@ -75,15 +75,15 @@ app.get('/filteredaway', (req, res) => {
 
     res.send(renderLayout('Challenge 2: Filtered Away', `
         <h1>Filtered Away</h1>
+        <script>
+            const oldAlert = window.alert;
+            window.alert = function(n) { if (n == 1) oldAlert('flag{XSS_without_parentheses}'); else oldAlert('alert 1 pls');}
+        </script>
         <form>
             <input name="payload" placeholder="Say something..." value="${sanitized}">
             <button>Echo</button>
         </form>
         <div class="result">Result: ${sanitized}</div>
-        <script>
-            const oldAlert = window.alert;
-            window.alert = function(n) { if (n == 1) oldAlert('flag{XSS_without_parentheses}'); else oldAlert('alert 1 pls');}
-        </script>
         <div class="hint">Goal: Trigger alert(1). The filter may cause some troubles...</div>
     `));
 });
