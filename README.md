@@ -52,7 +52,7 @@ If you're not interested in the technical details, follow this pattern:
 ### FAQ
 
 **The system says I have `docker-compose` / `docker compose` instead of the other. What do I do?**
-Open `main.py`, go to line 31, and replace the command in the array with the actual command that works on your device.
+Open `main.py`, go to line 31 (and others! please find and replace), and replace the command in the array with the actual command that works on your device.
 
 
 **It doesn't work , and the error is somehow related to docker or permissions.**
