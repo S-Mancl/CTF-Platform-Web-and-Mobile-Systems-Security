@@ -25,6 +25,8 @@ const initLevel = (lvl) => {
     } else if (lvl == "5") {
         addLog('trudy', "In this final level, Bob is using a mutual authentication protocol that should be secure against replay and reflection attacks. However, there might be a flaw in the way Alice and Bob are implementing the protocol. Can you find a way to trick Bob into accepting you as Alice without actually being Alice? Notice that Alice is asking to speak with you... Remember Lowe's...");
         addLog('alice', "Initiating connection with Trudy: 'ENC_PkTrudy[Nonce_77, Alice]'");
+        addLog('trudy','known public keys: PkBob, PkAlice')
+        addLog('trudy', 'nonce derived: Nonce_77')
     } else if (lvl == "4") {
         addLog('trudy', "In this level, Bob is using a ticket-based authentication system. However, you have found an old ticket in your database that might still be valid. Can you use it to impersonate Alice and gain access to Bob's services? Replay attacks can be very effective if the system doesn't properly validate the freshness of the tickets.");
         state.oldTicket = "TICKET{Key:SESS_99, User:Alice, Issued:2023}";
@@ -135,7 +137,7 @@ if (lvl == "4") {
     }
 }
     if (lvl == "5") {
-        if (to === "Bob" && msg.includes("Alice")) {
+        if (to === "Bob" && msg.includes("ENC_PkBob[Nonce_77, Alice]")) {
             addLog('bob', "Hi Alice! Here is your nonce back + mine: ENC_PkAlice[Nonce_77, Nonce_Bob]");
             state.solved = false;
         } else if (to === "Alice" && msg.includes("Nonce_77")) {
