@@ -1,9 +1,221 @@
 <html>
     <head>
-        <title>TEST</title>
+        <title>SWM Lab</title>
     </head>
     <body>
-        <h1>TEST</h1>
-        <p>TEST</p>
+        <h1>Web and Mobile Systems Security</h1>
+
+        <h2>General infos:</h2>
+        <ul>
+            <li>Course webpage: <a href="https://myariel.unimi.it/course/view.php?id=11321">MyAriel</a></li>
+            <li>Course public page: <a href="https://www.unimi.it/it/corsi/insegnamenti-dei-corsi-di-laurea/2027/sicurezza-nei-sistemi-web-e-mobili">Unimi</a></li>
+            <li>GitHub Repo for labs: <a href="https://github.com/S-Mancl/CTF-Platform-Web-and-Mobile-Systems-Security">CTF-Platform-Web-and-Mobile-Systems-Security</a></li>
+        </ul>
+
+        <h2>Course tentative schedule:</h2>
+        <table border="1">
+            <tr>
+                <th>Date</th>
+                <th>Lab nr</th>
+                <th>Topic</th>
+                <th>Room</th>
+                <th>Technical Prerequisites</th>
+            </tr>
+            <tr>
+                <td>2026-03-06</td>
+                <td>1</td>
+                <td>Cookies</td>
+                <td>ALFA</td>
+                <td>Platform installed and working</td>
+            </tr>
+            <tr>
+                <td>2026-03-13</td>
+                <td>2</td>
+                <td>Cross-Site Scripting (XSS)</td>
+                <td>ALFA</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2026-03-18</td>
+                <td>3</td>
+                <td>Basic SQL Injection</td>
+                <td style="color:red">Aula magistrale 3^ piano</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2026-03-23</td>
+                <td>4</td>
+                <td>Advanced SQL Injection</td>
+                <td>GAMMA Labc</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2026-03-30</td>
+                <td>5</td>
+                <td>Intermediate Mixed CTF</td>
+                <td>GAMMA Labc</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2026-04-08</td>
+                <td>6</td>
+                <td>Cross-Site Request Forgery</td>
+                <td style="color:red">Aula magistrale 5^ piano</td>
+                <td>ngrok working</td>
+            </tr>
+            <tr>
+                <td>2026-04-17</td>
+                <td>7</td>
+                <td>Protocols</td>
+                <td>ALFA</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2026-05-04</td>
+                <td>8</td>
+                <td>Online privacy and tracking</td>
+                <td>GAMMA Labc</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2026-05-13</td>
+                <td>9</td>
+                <td>Mobile Security</td>
+                <td style="color:red">Aula magistrale 5^ piano</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2026-05-18</td>
+                <td>10</td>
+                <td>Challenge Review</td>
+                <td>Gamma Labc</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2026-05-20</td>
+                <td>11</td>
+                <td>Final Mixed CTF</td>
+                <td style="color:red">Aula magistrale 5^ piano</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="color:gray">?2026-05-22?</td>
+                <td>12</td>
+                <td>Hack The N4S@!</td>
+                <td>ALFA</td>
+                <td>Subscribe on the form!</td>
+            </tr>
+        </table>
+
+        <h2>Possible project topics:</h2>
+        <ul>
+          <li>
+            XSS:
+            <ul>
+              <li>Develop a tool that tries to understand which filters are used in a blacklist-based system by sending multiple requests, progressively approximating the filter by observing what gets inserted into the page (with as few requests as possible).</li>
+              <li>Build a system that learns from past XSS attacks performed against it and progressively adapts its filters (making them as general as possible without blocking legitimate input).</li>
+              <li>Develop a set of challenges with poorly designed whitelists that leave too much room for exploitation (they can become very complex quickly: it is important that there is always a reasonable way to solve them).</li>
+            </ul>
+          </li>
+
+          <li>
+            SQLi:
+            <ul>
+              <li>Tool that, given the ability to perform queries, determines (Project A: type and version; Project B: full schema) via SQL injection by attempting multiple techniques (union-based, error-based, time-based) and adapting its dialect based on the responses it receives.</li>
+              <li>(Simpler) Tool that analyzes code to find SQL injection vulnerabilities and proposes versions using prepared statements to prevent them.</li>
+              <li>In the challenges proposed in the lab there are many unintended solves: find as many as possible, list and analyze them, and propose ways to preserve the challenge (you cannot eliminate SQL injection using prepared statements, otherwise the challenge would no longer exist!) while preventing as many unintended solves as possible. If an unintended solve cannot be fixed or mitigated in any way, explain why.</li>
+            </ul>
+          </li>
+
+          <li>
+            CSRF:
+            <ul>
+              <li>Create a module to integrate into the platform where brute force is required to guess the token.</li>
+              <li>Create a module to integrate into the platform where defenses rely on SameSite and/or Referer headers (take inspiration from PortSwigger).</li>
+              <li>Additionally: develop a set of challenges where the goal is to convince an LLM that a request is legitimate (think <a href="https://gandalf.lakera.ai/">Gandalf</a>-style challenges) so that the bot executes or visits it.</li>
+            </ul>
+          </li>
+
+          <li>
+            Authentication / Protocols / Challenge-response:
+            <ul>
+              <li>Starting from the protocols studied in the lab, think of measures to make them more secure, introduce them one at a time, and evaluate which attacks are still possible (all accompanied by the creation of new challenges).</li>
+              <li>Improve the existing labs to include more robust state management and allow participants A and B to correctly complete the protocol.</li>
+            </ul>
+          </li>
+        </ul>
+
+
+        <h2>CTF Platform</h2>
+        <p>The platform is available at 
+            <a href="https://github.com/S-Mancl/CTF-Platform-Web-and-Mobile-Systems-Security">
+                CTF-Platform-Web-and-Mobile-Systems-Security
+            </a>.
+        </p>
+
+        <h3>Prerequisites:</h3>
+        <ul>
+            <li>A Python interpreter (suggested Python 3.8+)</li>
+            <li>The Python packages fastapi and uvicorn</li>
+            <li>Docker and Docker Compose (see FAQ for docker compose vs docker-compose)</li>
+        </ul>
+
+        <h3>System Requirements:</h3>
+        <ul>
+            <li>Ports 8000–8100 should be available.</li>
+            <li><b>WARNING:</b> The system is not guaranteed to be secure. Use it only on localhost.</li>
+        </ul>
+
+        <h3>How to Start It:</h3>
+        <p>Enter the project folder and run:</p>
+        <pre>make</pre>
+        <p>Alternatively:</p>
+        <pre>python3 ./main.py</pre>
+        <p>On Windows:</p>
+        <pre>python3 main-windows.py</pre>
+        <p>You may need WSL installed.</p>
+
+        <p>Once started, access the platform at:
+            <a href="http://localhost:8000/">http://localhost:8000/</a>
+        </p>
+
+        <h3>How to Use It:</h3>
+        <p>After opening the platform, you will see a list of containers.</p>
+        <p><b>Rule:</b> 1 container = 1 laboratory = 1 port = 1 card</p>
+
+        <p>Each card provides the following actions:</p>
+        <ul>
+            <li>Start - starts the container</li>
+            <li>Stop - stops the container</li>
+            <li>Build - builds the image</li>
+            <li>Logs - shows container logs</li>
+            <li>Open - opens the associated web service</li>
+            <li>Delete container - removes the container</li>
+            <li>Full reset - removes both container and image</li>
+        </ul>
+
+        <p><b>Quick usage workflow:</b></p>
+        <ol>
+            <li>Press <b>Start</b> (auto-builds if needed)</li>
+            <li>Click the web icon to access the lab</li>
+            <li>When finished, press <b>Full reset</b></li>
+        </ol>
+
+        <h3>How to Stop It:</h3>
+        <pre>CTRL + C</pre>
+
+        <h3>FAQ:</h3>
+        <p><b>Docker compose vs docker-compose error:</b><br>
+        Edit <code>main.py</code> (line 31 and others) and replace the command with the one supported by your system.</p>
+
+        <p><b>Docker permission issues:</b><br>
+        Ensure your user is in the docker group. Then restart your shell and try again.</p>
+
+        <p><b>Nothing works:</b><br>
+        Open an issue in the GitHub repository with a detailed description of the problem and any error messages you receive.</p>
+
+        <p><b>I want to contribute:</b><br>
+        Fork the repository, make your changes, and submit a pull request. Contributions are welcome!</p>
+
     </body>
 </html>
