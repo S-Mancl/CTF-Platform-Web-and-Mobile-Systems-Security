@@ -14,6 +14,7 @@ async def favicon():
 def get_index():
     return FileResponse("index.html")
 
+""" OLD
 @app.get("/list")
 def list_projects():
     if not os.path.exists(STACKS_DIR):
@@ -39,6 +40,51 @@ def list_projects():
                 
         projects.append({"name": name, "status": status, "link": f"http://localhost:{8000+int(name[0])}"})
     return projects
+"""
+
+@app.get("/list")
+def list_projects():
+    if not os.path.exists(STACKS_DIR):
+        os.makedirs(STACKS_DIR)
+
+    projects = []
+
+    folders = sorted([
+        f for f in os.listdir(STACKS_DIR)
+        if os.path.isdir(os.path.join(STACKS_DIR, f))
+    ])
+
+    for name in folders:
+        path = os.path.join(STACKS_DIR, name, "docker-compose.yml")
+        status = "stopped"
+
+        if os.path.exists(path):
+            try:
+                cmd = [
+                    "docker", "compose",
+                    "-f", path,
+                    "ps",
+                    "--format", "json"
+                ]
+
+                output = subprocess.check_output(
+                    cmd,
+                    stderr=subprocess.DEVNULL
+                ).decode().strip()
+
+                if output:
+                    status = "running"
+
+            except Exception:
+                status = "stopped"
+
+        projects.append({
+            "name": name,
+            "status": status,
+            "link": f"http://localhost:{8000 + int(name[0])}"
+        })
+
+    return projects
 
 @app.post("/action/{project}/{cmd}")
 def handle_action(project: str, cmd: str):
@@ -53,7 +99,7 @@ def handle_action(project: str, cmd: str):
     }
     
     if cmd in actions:
-        full_cmd = ["docker-compose", "-f", path] + actions[cmd]
+        full_cmd = ["docker", "compose", "-f", path] + actions[cmd]
         subprocess.Popen(full_cmd)
     
     return {"status": "ok"}
@@ -64,7 +110,7 @@ async def stream_logs(project: str):
 
     def log_generator():
         cmd = [
-            "docker-compose", "-f", path, 
+            "docker", "compose", "-f", path, 
             "logs", "-f", "--tail", "100", 
             "--no-color", "--no-log-prefix"
         ]
