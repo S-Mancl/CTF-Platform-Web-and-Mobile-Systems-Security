@@ -1,0 +1,2 @@
+GRANT FILE ON *.* TO 'ctf'@'%';
+FLUSH PRIVILEGES;

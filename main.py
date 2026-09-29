@@ -37,7 +37,7 @@ def get_compose_file(project_dir: str):
 
 def parse_folder_name(folder_name: str, base_port: int = 8000):
     """
-    Parses folder formats like: 01-[CORE]-cookie-challenges
+    Parses folder formats like: 01-[WEB SECURITY]-cookie-challenges
     Returns: (port, type, display_name)
     """
     # Regex expects: numbers-[TYPE]-rest_of_string
@@ -72,7 +72,7 @@ def get_project_info(folder_name: str):
     port, stack_type, display_name = parse_folder_name(folder_name)
 
     return {
-        "id": folder_name,          # The actual directory name (e.g. 01-[CORE]-test)
+        "id": folder_name,          # The actual directory name (e.g. 01-[WEB SECURITY]-test)
         "name": display_name,       # Cleaned up name (e.g. Test)
         "type": stack_type,         # The section group (e.g. CORE)
         "status": status,
@@ -132,15 +132,21 @@ HOME_HTML = f"""
             
             container.innerHTML = '';
             
-            // Group the data by stack type
+            // Group thesis and student projects together while retaining their tags.
             const groupedData = data.reduce((acc, curr) => {{
-                if (!acc[curr.type]) acc[curr.type] = [];
-                acc[curr.type].push(curr);
+                const section = ['THESIS', 'PROJECTS'].includes(curr.type) ? 'THESIS & PROJECTS' : curr.type;
+                if (!acc[section]) acc[section] = [];
+                acc[section].push(curr);
                 return acc;
             }}, {{}});
 
-            // Sort types alphabetically
-            const types = Object.keys(groupedData).sort();
+            // Keep the course progression order, regardless of folder names.
+            const typeOrder = ['WEB SECURITY', 'CRYPTOGRAPHY', 'THESIS & PROJECTS'];
+            const types = Object.keys(groupedData).sort((a, b) => {{
+                const aIndex = typeOrder.indexOf(a);
+                const bIndex = typeOrder.indexOf(b);
+                return (aIndex === -1 ? typeOrder.length : aIndex) - (bIndex === -1 ? typeOrder.length : bIndex);
+            }});
 
             types.forEach(type => {{
                 // Inject Section Header
@@ -152,9 +158,18 @@ HOME_HTML = f"""
                 `);
                 
                 // Inject Cards for this Section
-                groupedData[type].forEach(p => {{
+                const cardOrder = type === 'CRYPTOGRAPHY' ? ['RSA', 'MODES OF OPERATIONS', 'ADVANCED'] : [];
+                const cards = groupedData[type].sort((a, b) => {{
+                    if (cardOrder.length) return cardOrder.indexOf(a.name) - cardOrder.indexOf(b.name);
+                    if (type === 'THESIS & PROJECTS') return ['THESIS', 'PROJECTS'].indexOf(a.type) - ['THESIS', 'PROJECTS'].indexOf(b.type);
+                    return a.id.localeCompare(b.id);
+                }});
+                cards.forEach(p => {{
                     const isRunning = p.status === 'running';
                     const statusColor = isRunning ? 'bg-green-500 glow-green' : 'bg-gray-600';
+                    const typeBadge = type === 'THESIS & PROJECTS'
+                        ? `<span class="inline-block mb-4 px-2.5 py-1 rounded border border-blue-500/30 bg-blue-500/10 text-blue-300 text-xs font-bold tracking-wider">${{p.type}}</span>`
+                        : '';
                     
                     const html = `
                         <a href="/stack/${{p.id}}" class="block bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg hover:border-blue-500 hover:shadow-blue-900/20 transition duration-200 cursor-pointer group flex flex-col h-full">
@@ -162,6 +177,7 @@ HOME_HTML = f"""
                                 <h2 class="text-xl font-bold text-white group-hover:text-blue-400 transition pr-4">${{p.name}}</h2>
                                 <span class="w-3 h-3 rounded-full flex-shrink-0 mt-2 ${{statusColor}}"></span>
                             </div>
+                            ${{typeBadge}}
                             <p class="text-sm text-gray-400 font-mono mt-auto flex justify-between">
                                 <span>Port: ${{p.port}}</span>
                                 <span class="text-xs uppercase tracking-wider ${{isRunning ? 'text-green-400' : 'text-gray-500'}} font-bold">${{p.status}}</span>
@@ -349,6 +365,7 @@ def list_projects():
         folders = sorted([
             f for f in os.listdir(STACKS_DIR)
             if os.path.isdir(os.path.join(STACKS_DIR, f))
+            and get_compose_file(os.path.join(STACKS_DIR, f))
         ])
     except Exception:
         folders = []

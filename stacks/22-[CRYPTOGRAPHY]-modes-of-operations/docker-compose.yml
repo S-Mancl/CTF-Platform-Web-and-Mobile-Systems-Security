@@ -1,0 +1,12 @@
+services:
+  challenge:
+    build: .
+    ports:
+      - "8022:3000"
+      - "9022:4000"
+    environment:
+      TITLE: MODES OF OPERATIONS
+      MODE_KEY: 00112233445566778899aabbccddeeff
+      NOTADMIN_FLAG: KSUS{cbc_tokens_are_malleable}
+      PADDING_FLAG: KSUS{padding_oracles_leak_plaintext}
+      ECB_FLAG: KSUS{ecb_reveals_repeated_blocks}

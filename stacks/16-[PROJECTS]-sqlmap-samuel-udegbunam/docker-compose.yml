@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ctf
+      MYSQL_USER: ctf
+      MYSQL_PASSWORD: ctf
+    command: --secure-file-priv=/shells
+    volumes:
+      - shells:/shells
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+  sqlmap-intro:
+    build: .
+    ports:
+      - "8016:3000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: ctf
+      MYSQL_PASSWORD: ctf
+      MYSQL_DATABASE: ctf
+    volumes:
+      - shells:/shells
+    depends_on:
+      - mysql
+    restart: unless-stopped
+volumes:
+  shells:
